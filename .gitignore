@@ -1,0 +1,6 @@
+model
+llm_env
+.env
+sample_pdf
+images
+.ipynb_checkpoints
