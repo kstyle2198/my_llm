@@ -105,6 +105,10 @@ if __name__ == "__main__":
 
     pdf_path = "C:\my_develop2\my_llm\sample_pdf\c4611_sample_explain.pdf"
     st.subheader("PDF 문서 내용 및 표 추출")
+
+
+
+    
     if st.button("block_based_parsing"):
         st.session_state['blocked_content'] = block_based_parsing(pdf_path)
     

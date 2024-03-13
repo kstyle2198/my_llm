@@ -24,6 +24,7 @@ from langchain.chains import RetrievalQA, ConversationalRetrievalChain
 from langchain.embeddings import HuggingFaceEmbeddings
 # from langchain.vectorstores import FAISS
 from langchain_community.vectorstores import FAISS
+from ctransformers import AutoModelForCausalLM
 
 from langchain.callbacks import StreamlitCallbackHandler
 from llama_cpp import Llama
@@ -154,6 +155,8 @@ if __name__ == "__main__":
     texts = st.text_area("🍀 Context", sample_text, height=500)
 
     col1, col2, col3, col4, col5 = st.columns(5)
+
+
 
     models = {"🦙LLAMA2_7B": "C:/my_develop2/my_llm/model/llama-2-7b-chat.ggmlv3.q8_0.bin",
             "🪁MISTRAL_7B": "C:/my_develop2/my_llm/model/mistral-7b-instruct-v0.1.Q8_0.gguf",}
