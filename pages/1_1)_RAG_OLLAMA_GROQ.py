@@ -17,6 +17,13 @@ load_dotenv()  #
 
 groq_api_key = os.environ['GROQ_API_KEY']
 
+from datetime import datetime, timedelta
+def calculate_time_delta(start_time, end_time):
+    # Calculate the time difference (time delta) in seconds
+    time_difference = end_time - start_time
+    seconds = time_difference.seconds
+    return seconds
+
 
 @st.cache_data
 def get_text(docs):
@@ -60,7 +67,7 @@ if "prompt" not in st.session_state:
 
 
 
-
+##########################################################################
 
 if __name__ == "__main__":
     st.title("Chat with Docs - Groq Edition :) ")
@@ -103,7 +110,8 @@ if __name__ == "__main__":
 
 
         # If the user hits enter
-        if prompt:
+        if st.session_state.prompt:
+            start_time = datetime.now()
             # Then pass the prompt to the LLM
             start = time.process_time()
             response = retrieval_chain.invoke({"input": st.session_state.prompt})
@@ -118,6 +126,9 @@ if __name__ == "__main__":
                     # print(doc)
                     # st.write(f"Source Document # {i+1} : {doc.metadata['source'].split('/')[-1]}")
                     st.write(doc.page_content)
+            end_time = datetime.now()
+            delta = calculate_time_delta(start_time, end_time)
+            st.markdown(f"응답소요시간(초): {delta}")
 
 
 

@@ -16,7 +16,7 @@ def delete_files_with_extension(folder_path, extension):
 
 # 특정 폴더와 확장자를 지정하여 함수를 호출합니다.
 
-folder_path = "C:\my_develop2\my_llm"
+folder_path = "D:\AA_develop\my_llm"
 extensions = [".docx", ".pptx", ".pdf", "PDF", 'png', 'csv']
 for ext in extensions:
     delete_files_with_extension(folder_path, ext)

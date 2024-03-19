@@ -45,6 +45,36 @@ samples = {
             'The national park had great views',
             'There were lot of rare animals in national park',
             'Olive oil drizzled over pizza tastes delicious'],
+    'eng1': ['FAN PANEL냉각 110V,2PH,SJ1238HA1/120120*38',
+            'FAN PANEL냉각 AC220VV,1PH,SJ1238HA2,120*120*38',
+            'FAN PANEL냉각 12V,2PH,HFB44B,COOLACE SEPA',
+            '환풍기 HYE SUNG HV-35B',
+            'NBK MEGA CHECK CLESNER 450ML'],
+    'eng2': ['emergency', 'fire', 'vacation', 'hospital', 'baseball', 'injury', 'evacuation'],
+    'eng3': ['''
+            ||HEATING MEDIUM|COOLING MEDIUM|
+            |Source|M/E jacket cooling F.W. (M/E model : HYUNDAI-MAN B&W 6G70ME-C10.5-HPSCR)|S.W.|
+            |Flow rate (m3/h)|Maker's standard|Maker's standard|
+            |℃ Inlet temp.( )|83|32|
+            |Press.(bar)|4.5|Maker's standard|
+            ||Distillate pump|Ejector pump|
+            |Capacity|Maker's standard|To be supplied by shipyard|
+            |Total head|Maker's standard|None|
+            |Shaft seal|Maker's standard|None|
+            ''',
+            '''
+            ||HEATING MEDIUM|COOLING MEDIUM|
+            |Source|M/E jacket cooling F.W. (M/E model : HYUNDAI-MAN B&W 6G60ME-C10.5-HPSCR)|S.W.|
+            |Flow rate (m3/h)|Maker's standard|Maker's standard|
+            |℃ Inlet temp.( )|83|32|
+            |Press.(bar)|5.5|Maker's standard|
+            ||Distillate pump|Ejector pump|
+            |Capacity|Maker's standard|To be supplied by shipyard|
+            |Total head|Maker's standard|None|
+            |Shaft seal|Maker's standard|None|
+            '''
+            ],
+
     "kor" : ['오늘까지 프리젠테이션 발표자료를 준비해야 합니다.',
             '어제 늦은 밤까지 자료 검토하느라 야근을 했습니다.',
             '오늘 미팅은 오전과 오후에 이어져 실시될 예정입니다.',
@@ -93,7 +123,7 @@ if __name__ == "__main__":
 
     with st.spinner("Loading..."):
         if btn1:
-            st.session_state['model'] = SentenceTransformer('paraphrase-MiniLM-L6-v2')
+            st.session_state['model'] = SentenceTransformer(f'{sel1}')
     st.session_state['model']
     
 

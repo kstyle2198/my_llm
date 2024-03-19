@@ -14,7 +14,7 @@ if __name__ == "__main__":
     st.markdown("---")
 
 
-    file_ = open("C:/my_develop2/my_llm/images/aaa.gif", "rb")
+    file_ = open("D:/AA_develop/my_llm/images/aaa.gif", "rb")
     contents = file_.read()
     data_url = base64.b64encode(contents).decode("utf-8")
     file_.close()

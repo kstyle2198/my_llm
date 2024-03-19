@@ -8,7 +8,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 import matplotlib.pyplot as plt
 import os
-os.chdir("C:\my_develop2\my_llm")
+os.chdir("D:/AA_develop/my_llm")
 
 st.set_page_config(layout="wide",page_title="OCR")
 
@@ -37,7 +37,7 @@ def draw_boundary_box(result):
     img = cv2.imread(file_path) 
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) 
     plt.figure(figsize=(65,65))
-    annotated = draw_ocr(img, boxes, texts, scores, font_path="C:\my_develop2\my_llm\malgun.ttf") 
+    annotated = draw_ocr(img, boxes, texts, scores, font_path="D:/AA_develop/my_llm/malgun.ttf") 
     st.image(annotated)
 
 
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     st.title("OCR with paddleocr")
 
   
-    file_path = "C:\my_develop2\my_llm\images\eng_receipt.png"
+    file_path = "D:\AA_develop\my_llm\images\eng_receipt.png"
     img = Image.open(file_path)
     st.image(img, width=300)
     

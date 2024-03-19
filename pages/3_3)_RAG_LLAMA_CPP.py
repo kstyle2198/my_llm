@@ -27,7 +27,7 @@ from langchain_community.vectorstores import FAISS
 from ctransformers import AutoModelForCausalLM
 
 from langchain.callbacks import StreamlitCallbackHandler
-from llama_cpp import Llama
+# from llama_cpp import Llama
 
 st.set_page_config(layout="wide",page_title="RAG_CHATBOT")
 
@@ -158,9 +158,8 @@ if __name__ == "__main__":
 
 
 
-    models = {"🦙LLAMA2_7B": "C:/my_develop2/my_llm/model/llama-2-7b-chat.ggmlv3.q8_0.bin",
-            "🪁MISTRAL_7B": "C:/my_develop2/my_llm/model/mistral-7b-instruct-v0.1.Q8_0.gguf",}
-
+    models = {"🦙LLAMA2_7B": "D:\AA_develop\my_llm\model\llama-2-7b-chat.ggmlv3.q8_0.bin",
+            "🪁MISTRAL_7B": "D:\AA_develop\my_llm\model\mistral-7b-instruct-v0.1.Q8_0.gguf"}
     model_types = {"🦙LLAMA2_7B": "llama",
                    "🪁MISTRAL_7B":"mistral",}
 
@@ -252,13 +251,10 @@ if __name__ == "__main__":
 
             st.session_state['answer'].append(response["result"])
             st.session_state['src_docu1'].append(response["source_documents"][0].page_content)
-            # st.session_state['src_meta1'].append(response["source_documents"][0].metadata["source"])
             try:
                 st.session_state['src_docu2'].append(response["source_documents"][1].page_content)
-            #     st.session_state['src_meta2'].append(response["source_documents"][1].metadata["source"])
             except:
                 st.session_state['src_docu2'].append("")
-            #     st.session_state['src_meta2'].append("")
 
             st.markdown(f"😆 :blue[{st.session_state['answer'][-1]}]")
             end_time = datetime.now()
