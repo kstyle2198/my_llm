@@ -25,35 +25,20 @@ if __name__ == "__main__":
     st.title("Document Loaders & Metadata Edit")
 
     upload_files = st.file_uploader("File Uploader - PDF, DOCX, TXT, CSV, PPTX")
-    # upload_files
-    # st.session_state.document1 = get_text(upload_files)
-    # st.subheader("Origin Document Data")
-    # st.session_state.document1
-    
-    
-    filename = upload_files.name
-    file_path = "D:\\AA_develop\\my_llm\\sample_pdf\\" + filename
+    try: 
+        filename = upload_files.name
+        file_path = "D:\\AA_develop\\my_llm\\sample_pdf\\" + filename
+    except:
+        file_path = "D:\\AA_develop\\my_llm\\sample_pdf\\FWG.pdf"
+
     loader = PyPDFLoader(file_path)
     pages = loader.load()
     pages
     len(pages)
     
 
-    # # try:
-    # filename = upload_files.name
-    # file_path = "D:\\AA_develop\\my_llm\\sample_pdf\\" + filename
-    # pdf_file = open(file_path, 'rb')
-    # reader = PyPDF2.PdfReader(pdf_file)
-
-    # page_num = 0
-    # page = reader.pages[page_num]
-    # st.session_state.text = page.extract_text()
-    # st.session_state.text
-
     print('--------------------------------------------------')
         
-    # except:
-    #     st.empty()
 
     st.markdown("---")
     st.subheader("Metadata Edit Test")

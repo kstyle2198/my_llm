@@ -6,6 +6,8 @@ from spire.pdf import *
 import fitz
 
 
+
+
 st.set_page_config(layout="wide",page_title="Parsing")
 
 def block_based_parsing_by_page(pdf_path, page_num):
@@ -106,9 +108,14 @@ if __name__ == "__main__":
     st.markdown("---")
 
 
-    pdf_path1 = "D:\AA_develop\my_llm\sample_pdf\FWG.pdf"
-    # pdf_path1 = "D:\AA_develop\my_llm\sample_pdf\LNGC.pdf.pdf"
-
+    uploadfile = st.file_uploader("PDF 업로드")
+    try:
+        with open(os.path.join('D:/AA_develop/my_llm/sample_pdf/',uploadfile.name),"wb") as f:
+            f.write(uploadfile.getbuffer())
+        pdf_path1 = f"D:/AA_develop/my_llm/sample_pdf/{uploadfile.name}"
+    except:
+        pdf_path1 = "D:\AA_develop\my_llm\sample_pdf\FWG.pdf"
+    
     page_num = st.number_input("페이지 번호 입력(시범 34)", step=1)
 
 
@@ -144,93 +151,94 @@ if __name__ == "__main__":
     for image_path in st.session_state['image_filenames']:
         st.image(image_path)
 
+    st.markdown("---")
+    st.subheader("Extract Highlights(Annotations)")
+   
+    # Open the PDF
+    doc = fitz.open(pdf_path1)
 
+    # Define the RGB values for your colors
+    PINK = (0.9686269760131836, 0.6000000238418579, 0.8196079730987549)
+    YELLOW = (1.0, 0.9411770105361938, 0.4000000059604645)
+    GREEN = (0.49019598960876465, 0.9411770105361938, 0.4000000059604645)
+    RED = (0.9215689897537231, 0.2862749993801117, 0.2862749993801117)
+
+    color_definitions = {"Pink": PINK, "Yellow": YELLOW, "Green": GREEN, "Red": RED}
+
+    # Create separate lists for each color
+    data_by_color = {"Pink": [], "Yellow": [], "Green": [], "Red": []}
+
+    # Loop through every page
+    for i in range(len(doc)):
+        page = doc[i]
+        annotations = page.annots()
+        for annotation in annotations:
+            if annotation.type[1] == 'Highlight':
+                color = annotation.colors['stroke']  # Returns a RGB tuple
+                if color in color_definitions.values():
+                    # Get the detailed structure of the page
+                    structure = page.get_text("dict")
+
+                    # Extract highlighted text line by line
+                    content = []
+                    for block in structure["blocks"]:
+                        for line in block["lines"]:
+                            for span in line["spans"]:
+                                r = fitz.Rect(span["bbox"])
+                                if r.intersects(annotation.rect):
+                                    content.append(span["text"])
+                    
+                    content = " ".join(content)
+
+                    # Append the content to the appropriate color list
+                    for color_name, color_rgb in color_definitions.items():
+                        if color == color_rgb:
+                            data_by_color[color_name].append(content)
+    
+    data_by_color
 
     st.markdown("---")
-    st.subheader("Extract Highlights")
-    pg_num = st.number_input("페이지입력",min_value=0, max_value=10, value="min")
-    doc = fitz.open(pdf_path1)
-    st.markdown(f"총페이지수: {len(doc)}")
-    page = doc[pg_num]
-    page
-    # list to store the co-ordinates of all highlights
-    highlights = []
-    # loop till we have highlight annotation in the page
-    annot = page.first_annot
-    while annot:
-        if annot.type[0] == 8:
-            all_coordinates = annot.vertices
-            if len(all_coordinates) == 4:
-                highlight_coord = fitz.Quad(all_coordinates).rect
-                highlights.append(highlight_coord)
-            else:
-                all_coordinates = [all_coordinates[x:x+4] for x in range(0, len(all_coordinates), 4)]
-                for i in range(0,len(all_coordinates)):
-                    coord = fitz.Quad(all_coordinates[i]).rect
-                    highlights.append(coord)
-        annot = annot.next
-    
-    highlights
-
-    all_words = page.get_text_words()
-    st.markdown("x0, y0, x1, y1, “word”, block_no, line_no, word_no")
-    all_words
-
-    # List to store all the highlighted texts
-    highlight_text = []
-    for h in highlights:
-        sentence = [w[4] for w in all_words if   fitz.Rect(w[0:4]).intersects(h)]
-        highlight_text.append(" ".join(sentence))
-
-    highlight_text
-
-    total_highlight_text = " ".join(highlight_text)
-    st.markdown(f"total_highlight_text: {total_highlight_text}")
-
-
-    # st.markdown("---")
-    # doc = fitz.open(pdf_path1)
-
-    # # List to store all the highlighted texts
-    # highlight_text = []
-
-    # # loop through each page
-    # for page in doc:
-
-    #     # list to store the co-ordinates of all highlights
-    #     highlights = []
-        
-    #     # loop till we have highlight annotation in the page
-    #     annot = page.first_annot
-    #     while annot:
-    #         if annot.type[0] == 8:
-    #             all_coordinates = annot.vertices
-    #             if len(all_coordinates) == 4:   
-    #                 highlight_coord = fitz.Quad(all_coordinates).rect
-    #                 highlights.append(highlight_coord)
-    #             else:
-    #                 all_coordinates = [all_coordinates[x:x+4] for x in range(0, len(all_coordinates), 4)]
-    #                 for i in range(0,len(all_coordinates)):
-    #                     coord = fitz.Quad(all_coordinates[i]).rect
-    #                     highlights.append(coord)
-    #         annot = annot.next
-            
-    #     all_words = page.get_text("words")
-    #     total_highlight_text = ""
-    #     for h in highlights:
-    #         sentence = [w[4] for w in all_words if fitz.Rect(w[0:4]).intersects(h)]
-    #         highlight_text.append(" ".join(sentence))
-    #         total_highlight_text = " ".join(highlight_text)
-    # st.markdown(f"total_highlight_text: {total_highlight_text}")
-    
+    st.subheader("Extract Colored Texts")
+    def flags_decomposer(flags):
+        """Make font flags human readable."""
+        l = []
+        if flags & 2 ** 0:
+            l.append("superscript")
+        if flags & 2 ** 1:
+            l.append("italic")
+        if flags & 2 ** 2:
+            l.append("serifed")
+        else:
+            l.append("sans")
+        if flags & 2 ** 3:
+            l.append("monospaced")
+        else:
+            l.append("proportional")
+        if flags & 2 ** 4:
+            l.append("bold")
+        return ", ".join(l)
 
 
 
-
-
-
-    
-
+    # page = doc[0]
+    results = []
+    for page in doc:
+    # read page text as a dictionary, suppressing extra spaces in CJK fonts
+        blocks = page.get_text("dict", flags=11)["blocks"]
+        for b in blocks:  # iterate through the text blocks
+            for l in b["lines"]:  # iterate through the text lines
+                for s in l["spans"]:  # iterate through the text spans
+                    font_properties = "Font: '%s' (%s), size %g, color #%06x" % (
+                        s["font"],  # font name
+                        flags_decomposer(s["flags"]),  # readable font flags
+                        s["size"],  # font size
+                        s["color"],  # font color
+                    )
+                    if s["color"] != 0:
+                        results.append(s["text"])
+                    # st.markdown(f"Text: {s['text']}, color: {s['color']}")  # simple print of text
+                    # st.markdown(font_properties)
+    results
 
 
 

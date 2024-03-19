@@ -72,6 +72,15 @@ samples = {
             |Capacity|Maker's standard|To be supplied by shipyard|
             |Total head|Maker's standard|None|
             |Shaft seal|Maker's standard|None|
+            ''',
+            '''
+            ||UNIT COOLER FOR ENGINE CONTROL ROOM|UNIT COOLER FOR SWITCHBOARD ROOM|UNIT COOLER FOR WORKSHOP|
+            |Q’ty / Ship|Two(2) sets|Four(4) sets|One(1) set|
+            |Cooling Capacity|15,000 kcal/h|60,000 kcal/h|15,000 kcal/h|
+            |Refrigerant|R-407C|R-407C|R-407C|
+            |Air Flow|Maker's standard|Maker's standard|Maker's standard|
+            |Remark|#, ####|##|Without thermal insulation|
+
             '''
             ],
 
@@ -97,11 +106,6 @@ def draw_2d(df):
 def draw_3d(df):
     fig = px.scatter_3d(df, x=0, y=1, z=2,text = df.index,)
     st.plotly_chart(fig, theme="streamlit", use_container_width=True)
-
-
-
-
-
 
 
 #######################################################################################
