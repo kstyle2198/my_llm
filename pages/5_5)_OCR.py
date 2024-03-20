@@ -46,7 +46,7 @@ if __name__ == "__main__":
     st.title("OCR with paddleocr")
 
   
-    file_path = "D:\AA_develop\my_llm\images\eng_receipt.png"
+    file_path =  "D:\AA_develop\my_llm\images\eng_receipt.png"
     img = Image.open(file_path)
     st.image(img, width=300)
     
@@ -56,64 +56,79 @@ if __name__ == "__main__":
 
     draw_boundary_box(receipt_boxes)
 
-    # if st.button("OCR--->Json"):
-    #     import torch
-    #     from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig, BitsAndBytesConfig
 
-        # quantization_config = BitsAndBytesConfig(llm_int8_enable_fp32_cpu_offload=True)
-        # bnb_config = BitsAndBytesConfig(
-        #     llm_int8_enable_fp32_cpu_offload=True,
-        #     load_in_4bit=True,
-        #     bnb_4bit_use_double_quant=True,
-        #     bnb_4bit_quant_type="nf4",
-        #     bnb_4bit_compute_dtype=torch.bfloat16,
-        # )
+st.subheader("취소선 표시 텍스트 제거 방법 연구")
 
-        # bnb_config = BitsAndBytesConfig(
-        #         load_in_4bit= True,
-        #         bnb_4bit_quant_type= "nf4",
-        #         bnb_4bit_compute_dtype= torch.float16,
-        #         bnb_4bit_use_double_quant= False,
-        #         )
-        # control model memory allocation between devices for low GPU resource (0,cpu)
-        # device_map = {
-        #     "transformer.word_embeddings": 0,
-        #     "transformer.word_embeddings_layernorm": 0,
-        #     "lm_head": 0,
-        #     "transformer.h": 0,
-        #     "transformer.ln_f": 0,
-        #     "model.embed_tokens": 0,
-        #     "model.layers":0,
-        #     "model.norm":0    
-        # }
-        # device = "cuda" if torch.cuda.is_available() else "cpu"
+import PyPDF2
+from pdfminer.high_level import extract_text
+from pytesseract import image_to_string
+from PIL import Image
 
-        # # model use for inference
-        # model_id="mychen76/mistral7b_ocr_to_json_v1"
-        # model = AutoModelForCausalLM.from_pretrained(
-        #     model_id, 
-        #     trust_remote_code=True,  
-        #     torch_dtype=torch.float16,
-        #     # quantization_config=bnb_config,
-        #     device_map=device_map)
-        # # tokenizer
-        # tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True)
+def extract_text_from_pdf_with_cancellation(pdf_path):
+    # Extract text using PyPDF2
+    pdf_text = ""
+    with open(pdf_path, 'rb') as file:
+        pdf_reader = PyPDF2.PdfFileReader(file)
+        for page_num in range(pdf_reader.numPages):
+            page = pdf_reader.getPage(page_num)
+            pdf_text += page.extractText()
 
+    # Extract text using pdfminer
+    pdf_text += extract_text(pdf_path)
 
-        # prompt=f"""### Instruction:
-        # You are POS receipt data expert, parse, detect, recognize and convert following receipt OCR image result into structure receipt data object. 
-        # Don't make up value not in the Input. Output must be a well-formed JSON object.```json
+    # Extract text from images using pytesseract
+    pdf_images = []
+    with open(pdf_path, 'rb') as file:
+        pdf_reader = PyPDF2.PdfFileReader(file)
+        pdf_reader
 
-        # ### Input:
-        # {receipt_boxes}
+        for page_num in range(pdf_reader.numPages):
+            page = pdf_reader.getPage(page_num)
+            page
+            
+            if '/XObject' in page['/Resources']:
+                xObject = page['/Resources']['/XObject'].getObject()
+                for obj in xObject:
+                    if xObject[obj]['/Subtype'] == '/Image':
+                        size = (xObject[obj]['/Width'], xObject[obj]['/Height'])
+                        data = xObject[obj].getData()
+                        if xObject[obj]['/ColorSpace'] == '/DeviceRGB':
+                            mode = "RGB"
+                        else:
+                            mode = "P"
 
-        # ### Output:
-        # """
+                        if '/Filter' in xObject[obj]:
+                            if xObject[obj]['/Filter'] == '/FlateDecode':
+                                img = Image.frombytes(mode, size, data)
+                                pdf_images.append(img)
+                            elif xObject[obj]['/Filter'] == '/DCTDecode':
+                                img = open(obj[1:] + ".jpg", "wb")
+                                img.write(data)
+                                img.close()
+                                img = Image.open(obj[1:] + ".jpg")
+                                pdf_images.append(img)
+                            elif xObject[obj]['/Filter'] == '/JPXDecode':
+                                img = open(obj[1:] + ".jp2", "wb")
+                                img.write(data)
+                                img.close()
+                                img = Image.open(obj[1:] + ".jp2")
+                                pdf_images.append(img)
+    pdf_images
+    for image in pdf_images:
+        image_text = image_to_string(image)
+        pdf_text += image_text
 
-        # with torch.inference_mode():
-        #     inputs = tokenizer(prompt,return_tensors="pt",truncation=True).to(device)
-        #     outputs = model.generate(**inputs, max_new_tokens=512) ##use_cache=True, do_sample=True,temperature=0.1, top_p=0.95
-        #     result_text = tokenizer.batch_decode(outputs)[0]
-        #     st.markdown(result_text)
+    # 취소선이 있는 텍스트 제거
+    lines = pdf_text.split('\n')
+    filtered_lines = [line for line in lines if not any(char == '-' for char in line)]
+    filtered_text = '\n'.join(filtered_lines)
 
+    # Remove text with strikethrough
+    # You may need to implement your own logic to detect and remove strikethrough text
 
+    return filtered_text
+
+# Example usage
+pdf_path = "D:\\AA_develop\\my_llm\\sample_pdf\\FWG.pdf"
+extracted_text = extract_text_from_pdf_with_cancellation(pdf_path)
+st.markdown(extracted_text)
