@@ -121,13 +121,17 @@ if __name__ == "__main__":
     sentences = st.text_area("리스트 인풋 형태로...", samples[sel0])
     sentences =  eval(sentences)  # 'str'---> list
 
-    embedding_models = ['paraphrase-MiniLM-L6-v2', 'jhgan/ko-sroberta-multitask']
+    embedding_models = ['paraphrase-MiniLM-L6-v2', 'nomic-ai/nomic-embed-text-v1', 'jhgan/ko-sroberta-multitask']
     sel1 = st.selectbox("Select Embedding Model", embedding_models)
+    sel1
     btn1 = st.button("Load Model", type='primary')
 
     with st.spinner("Loading..."):
         if btn1:
-            st.session_state['model'] = SentenceTransformer(f'{sel1}')
+            if sel1 == "nomic-ai/nomic-embed-text-v1":
+                st.session_state['model'] = SentenceTransformer(f'{sel1}', trust_remote_code=True)
+            else:
+                st.session_state['model'] = SentenceTransformer(f'{sel1}')
     st.session_state['model']
     
 
